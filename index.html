@@ -446,6 +446,16 @@ textarea {
 .family-hearts span:nth-child(2){left:45%;animation-delay:1s}
 .family-hearts span:nth-child(3){left:80%;animation-delay:2s}
 .family-art {position:relative}
+/* Avatar del niño (figura completa tipo sticker, proporción 2:3) */
+.avatar-wrap {
+  width:150px;aspect-ratio:2/3;margin:6px auto 10px;border-radius:22px;
+  border:4px solid #fff;background:#fff;overflow:hidden;
+  box-shadow:0 6px 18px rgba(109,85,169,.28),0 0 0 3px #e9c68a;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.avatar-wrap img {display:block;width:100%;height:100%;object-fit:cover}
+.avatar-wrap[hidden] {display:none}
+.avatar-wrap.pequeno {width:110px;border-width:3px;border-radius:14px}
 .final-illustration .jesus-group {animation:fadeUp .8s both}
 .final-illustration .child-group {animation:fadeUp .8s .7s both}
 .final-illustration .big-heart {
@@ -574,7 +584,9 @@ textarea {
 <section class="screen" id="pantalla1" aria-labelledby="titulo1">
 <div class="inner">
   <div class="eyebrow">🛂 PASAPORTE A MI RECONCILIACIÓN</div>
+  <div class="avatar-wrap" data-avatar hidden><img alt="" decoding="async"></div>
   <h1 id="titulo1">¡Hola, <span data-nombre>Martina</span>! 👋</h1>
+  <div class="highlight" id="coverPhrase"></div>
   <p class="lead">Esta es una pequeña misión para preparar tu corazón ❤️</p>
 
   <svg class="illustration appear" viewBox="0 0 360 270" role="img" aria-label="Pasaporte abierto, mochila, corazón y camino">
@@ -641,12 +653,12 @@ textarea {
   </div>
 
   <div class="panel">
-    <p class="lead">Y pienso: ¿Cómo traté a…</p>
+    <p class="lead">Y pienso: ¿Cómo traté…</p>
     <div class="people-grid">
-      <div class="person"><span class="emoji">🙏</span>Jesús?</div>
-      <div class="person"><span class="emoji">🏠</span>mi familia?</div>
-      <div class="person"><span class="emoji">🧑‍🤝‍🧑</span>los demás?</div>
-      <div class="person"><span class="emoji">💛</span>mí mism<span data-g="o,a">o</span>?</div>
+      <div class="person"><span class="emoji">🙏</span>a Jesús?</div>
+      <div class="person"><span class="emoji">🏠</span>a mi familia?</div>
+      <div class="person"><span class="emoji">🧑‍🤝‍🧑</span>a los demás?</div>
+      <div class="person"><span class="emoji">💛</span>a mí mism<span data-g="o,a">o</span>?</div>
     </div>
   </div>
   <p class="highlight">No tengo que tener miedo. Jesús me conoce, me quiere y quiere ayudarme. ❤️</p>
@@ -705,7 +717,8 @@ textarea {
   </div>
 
   <div id="selectedQuestions" class="selected-grid" aria-label="Cosas para elegir"></div>
-  <div id="freeChoices" class="fields" hidden>
+  <p class="hint" id="freeIntro">✏️ Podés escribir con tus propias palabras lo que quieras contarle a Jesús:</p>
+  <div id="freeChoices" class="fields">
     <div class="field"><label for="free1">❤️ Corazón 1</label><textarea id="free1" rows="2"></textarea></div>
     <div class="field"><label for="free2">❤️ Corazón 2</label><textarea id="free2" rows="2"></textarea></div>
     <div class="field"><label for="free3">❤️ Corazón 3</label><textarea id="free3" rows="2"></textarea></div>
@@ -874,7 +887,7 @@ textarea {
     <p>❤️ Nos abraza.</p>
     <p>❤️ Nos ayuda a empezar de nuevo.</p>
   </div>
-  <p class="lead" id="finalPhrase"></p>
+  <div class="avatar-wrap" data-avatar hidden><img alt="" decoding="async"></div>
   <h2>¡NOS VEMOS! 🙌</h2>
   <div class="final-stamp">🛂 PASAPORTE SELLADO — List<span data-g="o,a">o</span> para el encuentro</div>
   <div class="btn-wrap">
@@ -889,6 +902,7 @@ textarea {
 
 <article id="printPage" class="print-only" aria-label="Pasaporte para imprimir">
   <h1>🛂 PASAPORTE A MI RECONCILIACIÓN</h1>
+  <div class="avatar-wrap pequeno" data-avatar hidden style="margin:4px auto 6px"><img alt="" decoding="async"></div>
   <p style="text-align:center;font-size:15pt"><strong id="printName"></strong></p>
 
   <section class="print-section">
@@ -906,11 +920,6 @@ textarea {
     <div class="print-box" id="printMission"></div>
   </section>
 
-  <section class="print-section">
-    <h2>❤️</h2>
-    <p id="printPhrase"></p>
-  </section>
-
   <div class="print-seal">🛂 PASAPORTE SELLADO — List<span data-g="o,a">o</span> para el encuentro</div>
 </article>
 
@@ -921,49 +930,69 @@ textarea {
    CONFIGURACIÓN — PODÉS EDITAR ESTAS LÍNEAS
    ==========================================================
 
-   NOMBRE:
-   Nombre del niño o la niña que aparece al abrir el archivo.
+   TABLA DE NIÑOS (const NINOS)
+   Una fila por niño o niña, con cuatro datos entre comillas:
 
-   FRASE_FINAL:
-   Frase personalizada para ese nombre (aparece en la
-   pantalla final y en la hoja impresa).
+       ["Nombre", "género", "Frase de la portada", "avatar.jpg"],
 
-   FRASES_POR_NOMBRE:
-   Frases opcionales para varios niños, usadas SOLO si el
-   archivo está publicado como link y se abre agregando
-   ?nombre=Nombre al final de la dirección.
-   No distingue mayúsculas de minúsculas.
+   - Nombre: es el que se escribe en el link, por ejemplo
+     ?nombre=Martina   (no importan mayúsculas ni acentos).
+   - Género: "nena" o "nene".
+   - Frase: aparece SOLO en la portada. Si queda vacía ("") se usa
+     la frase estándar.
+   - Avatar: nombre del archivo dentro de la carpeta avatares/
+     (por ejemplo "martina.jpg"). Si queda vacío o el archivo no
+     existe, la página se ve igual, sin avatar. Aparece en la
+     portada, en la pantalla final y en la hoja impresa.
+   Cada fila termina con una coma. No uses comillas dobles (")
+   dentro de la frase.
 
-   Ejemplo:
-   const FRASES_POR_NOMBRE = {
-     "Santi": "Santi, vení a encontrarte con Jesús con confianza."
-   };
+   Si dos niños se llaman igual, escribilos distinto en la tabla
+   (por ejemplo "Martina R" y "Martina G"): así se muestra y así
+   va en el link.
 
-   GENERO:
-   "nena" o "nene". Ajusta las palabras que hablan del niño o la
-   niña: "preparada/preparado", "lista/listo", "mí misma/mismo".
-   Cualquier otro valor deja la forma neutra: "preparado/a".
+   Si el nombre del link NO está en la tabla, se muestra ese
+   nombre con forma neutra ("preparado/a") y la frase estándar.
+   Con ?genero=nena o ?genero=nene en el link se puede indicar
+   el género aun sin tabla.
 
-   GENEROS_POR_NOMBRE:
-   Opcional, igual que FRASES_POR_NOMBRE pero con el género.
-   Ejemplo: { "Santi": "nene", "Juana": "nena" }
-   Con un link también se puede usar ?nombre=Juana&genero=nena
-   Si el link trae un nombre sin género, se usa la forma neutra.
+   NOMBRE, GENERO y FRASE_FINAL:
+   Solo se usan cuando el archivo se abre SIN ?nombre= (por
+   ejemplo, abriéndolo suelto con doble clic).
 
    IMPRIMIR_COSAS_ELEGIDAS:
-   true  = en la hoja impresa salen las cosas que el niño eligió
-           contarle a Jesús (pantalla 4).
-   false = en la hoja impresa quedan renglones en blanco
-           para que las escriba a mano.
+   true  = en la hoja impresa salen las TARJETAS que el niño eligió
+           en la pantalla 4 (por ejemplo "¿Mentí?").
+   false = las tarjetas no se imprimen.
+   En ambos casos, lo que el niño ESCRIBA en los campos de texto
+   de la pantalla 4 sí se imprime. Si no hay nada para imprimir,
+   quedan renglones en blanco para que lo escriba a mano.
 
    No hace falta cambiar nada más.
    ========================================================== */
 
+const NINOS = [
+  ["Jere", "nene", "¡Jereee! ❤️ Esta misión es para vos. Vamos a preparar ese corazón para encontrarte con Jesús. Acordate de que Él te quiere un montón y siempre te espera con los brazos abiertos. ¡Vamos arriba!", "jere.jpg"],
+  ["Pepe", "nene", "¡Pepeee! 💛 Te tengo una misión especial: mirar un poquito tu corazón y prepararte para estar con Jesús. No tenés que ser perfecto, solo venir con ganas de hablar con Él. ¡Te quiere muchísimo!", "pepe.jpg"],
+  ["Pipe", "nene", "¡Pipe! 🫶 Se viene un encuentro muy lindo con Jesús y quiero que prepares tu corazón con mucho cariño. Pensá en las cosas que querés mejorar y acordate: siempre podés volver a empezar. ¡Jesús está contigo!", "pipe.jpg"],
+  ["Gonza", "nene", "¡Gonzaaa! ⭐ Acá va tu misión para preparar el corazón. Tomate un ratito para pensar cómo venís tratando a Jesús y a los demás. No es para retarte, ¡es para ayudarte a crecer! Jesús te quiere así, y te ayuda a ser cada día mejor. ❤️", "gonza.jpg"],
+  ["Felix", "nene", "¡Félix! 💙 Te preparé esta mini misión para que llegues con el corazón listo para encontrarte con Jesús. Pensá tranquilo, sé sincero y no tengas miedo de contarle tus cosas. ¡Él te ama y siempre te da otra oportunidad!", "felix.jpg"],
+  ["Mateo", "nene", "¡Mateee! 🌟 ¿Listo para esta misión? Vamos a mirar un poquito ese corazón y pensar qué cosas lindas hiciste y cuáles podés mejorar. Jesús no espera que seas perfecto, ¡te espera porque te quiere un montón! ❤️", "mateo.jpg"],
+  ["Pauli", "nena", "¡Pauliii! 🌈 Esta misión es para vos y para ese corazón hermoso que vamos a preparar para Jesús. Pensá en las veces que hiciste las cosas bien y también en las que querés mejorar. Siempre hay una oportunidad para hacerlo mejor. ¡Te mando un abrazo enorme! ❤️", "pauli.jpg"],
+  ["Rami", "nene", "¡Ramiii! 🤗 Te toca una misión importante: preparar tu corazón para encontrarte con Jesús. Hacelo tranquilo, sin miedo y con sinceridad. Acordate de que Jesús no se cansa de quererte ni de darte otra oportunidad. ¡Vamos que se puede!", "rami.jpg"],
+  ["Caro", "nena", "¡Carooo! 🌷 Te preparé esta misión con mucho cariño. Regalate un ratito para hablar con Jesús, contarle lo que te pasa y pensar qué querés mejorar. Él conoce tu corazón y te quiere muchísimo. ¡Qué lindo poder encontrarte con Él! ❤️", "caro.jpg"],
+  ["Santi", "nene", "¡Santi! 💚 ¡Tenemos una misión para preparar ese corazón! Pensá con sinceridad en cómo tratás a los demás y en las cosas que querés cambiar. Y si te equivocaste, tranquilo: Jesús te quiere, te perdona y te ayuda a arrancar de nuevo. 🙌", "santi.jpg"],
+  ["Renzo", "nene", "¡Renzooo! 🚀 Arranca tu misión de preparar el corazón para Jesús. No hay respuestas perfectas ni tenés que esconder tus errores. Lo importante es ser sincero y tener ganas de mejorar. ¡Jesús está siempre de tu lado! ❤️", "renzo.jpg"],
+  ["Frani", "nena", "¡Franiii! 🩵 Esta misión es un ratito para vos y Jesús. Pensá en las cosas que te hicieron feliz, en las que hiciste bien y en las que te gustaría cambiar. Hablale desde el corazón, que Él te escucha siempre. ¡Te quiere más de lo que imaginás! ❤️", "frani.jpg"],
+  ["Juampi", "nene", "¡Juampiii! 🫶 Se viene un encuentro muy especial con Jesús. Prepará tu corazón con tranquilidad y acordate de que podés contarle todo, incluso las cosas que te cuestan. Él no te suelta la mano y siempre te ayuda a empezar otra vez. 💙", "juampi.jpg"],
+  ["Tintin", "nene", "¡Tintiiin! 😎 ¿Pronto para activar el detector del corazón? 🔎 Pensá qué cosas venís haciendo bien y cuáles podés mejorar. La idea no es ser perfecto, ¡es animarte a ser sincero con Jesús! Él te quiere una banda y siempre te recibe con amor. ❤️", "tintin.jpg"],
+  ["Jose", "nena", "¡Joseee! 💫 Te dejo esta mini misión para preparar tu corazón. Buscá un ratito tranquilo, pensá con sinceridad y contale a Jesús lo que quieras mejorar. Él te conoce de verdad, te ama muchísimo y siempre te da la oportunidad de volver a empezar. ❤️", "jose.jpg"],
+  ["Paz", "nena", "¡Pazzz! 🌸 Esta misión es para preparar tu corazón para un encuentro hermoso con Jesús. No tengas miedo de reconocer las cosas que querés mejorar. Él te ama tal como sos y quiere ayudarte a crecer, siempre con mucho amor. ¡Disfrutá este momento tan especial! ❤️", "paz.jpg"],
+];
+
 const NOMBRE = "Martina";
-const FRASE_FINAL = "Martina, acordate: Jesús siempre está dispuesto a recibirte.";
-const FRASES_POR_NOMBRE = {};
 const GENERO = "nena";
-const GENEROS_POR_NOMBRE = {};
+const FRASE_FINAL = "Martina, acordate: Jesús siempre está dispuesto a recibirte.";
 const IMPRIMIR_COSAS_ELEGIDAS = true;
 
 /* ==========================================================
@@ -971,7 +1000,8 @@ const IMPRIMIR_COSAS_ELEGIDAS = true;
    PRIVACIDAD:
    - No se guardan datos.
    - No se usan cookies ni localStorage.
-   - No se realizan solicitudes de red.
+   - No se envía ningún dato a ningún lado (solo se carga la
+     imagen del avatar del propio niño, desde la carpeta avatares/).
    - Todo permanece únicamente en memoria mientras
      la página está abierta.
    ========================================================== */
@@ -988,51 +1018,69 @@ function conMayuscula(texto) {
     : texto;
 }
 
-const nombre = tieneNombreURL
-  ? conMayuscula(nombreURL.trim().slice(0,60))
-  : NOMBRE;
-
-function buscarFrasePorNombre(n) {
-  const clave = Object.keys(FRASES_POR_NOMBRE).find(
-    k => k.trim().toLowerCase() === n.toLowerCase()
-  );
-  return clave !== undefined ? FRASES_POR_NOMBRE[clave] : null;
+/* Para comparar nombres sin importar mayúsculas, acentos ni espacios dobles */
+function clave(texto) {
+  return String(texto === null || texto === undefined ? "" : texto)
+    .normalize("NFD").replace(/[̀-ͯ]/g,"")
+    .toLowerCase().replace(/\s+/g," ").trim();
 }
 
-let fraseFinal = FRASE_FINAL;
-if (tieneNombreURL) {
-  const frasePropia = buscarFrasePorNombre(nombre);
-  fraseFinal = frasePropia !== null
-    ? frasePropia
-    : `${nombre}, acordate: Jesús siempre está dispuesto a recibirte.`;
+function normalizarGenero(valor) {
+  const v = clave(valor);
+  if (v === "nena" || v === "nina") return "nena";
+  if (v === "nene" || v === "nino") return "nene";
+  return null;
+}
+
+function buscarNino(n) {
+  const buscado = clave(n);
+  return NINOS.find(
+    fila => Array.isArray(fila) && clave(fila[0]) === buscado
+  ) || null;
+}
+
+function fraseEstandar(n) {
+  return `${n}, acordate: Jesús siempre está dispuesto a recibirte.`;
+}
+
+let nombre;
+let genero;
+let fraseFinal;
+let avatar = "";
+
+if (!tieneNombreURL) {
+  nombre = NOMBRE;
+  genero = normalizarGenero(GENERO);
+  fraseFinal = FRASE_FINAL;
+} else {
+  const nino = buscarNino(nombreURL);
+  if (nino) {
+    nombre = String(nino[0]).trim();
+    genero = normalizarGenero(nino[1]) || normalizarGenero(parametros.get("genero"));
+    fraseFinal = nino[2] && String(nino[2]).trim() !== ""
+      ? String(nino[2]).trim()
+      : fraseEstandar(nombre);
+    avatar = nino[3] ? String(nino[3]).trim() : "";
+  } else {
+    nombre = conMayuscula(nombreURL.trim().slice(0,60));
+    genero = normalizarGenero(parametros.get("genero"));
+    fraseFinal = fraseEstandar(nombre);
+  }
 }
 
 document.querySelectorAll("[data-nombre]").forEach(elemento => {
   elemento.textContent = nombre;
 });
-$("finalPhrase").textContent = fraseFinal;
+$("coverPhrase").textContent = fraseFinal;
 
-function normalizarGenero(valor) {
-  const v = String(valor === null || valor === undefined ? "" : valor)
-    .trim().toLowerCase();
-  if (v === "nena" || v === "niña" || v === "nina") return "nena";
-  if (v === "nene" || v === "niño" || v === "nino") return "nene";
-  return null;
-}
-
-function buscarGeneroPorNombre(n) {
-  const clave = Object.keys(GENEROS_POR_NOMBRE).find(
-    k => k.trim().toLowerCase() === n.toLowerCase()
-  );
-  return clave !== undefined ? GENEROS_POR_NOMBRE[clave] : null;
-}
-
-let genero = normalizarGenero(GENERO);
-if (tieneNombreURL) {
-  genero = normalizarGenero(parametros.get("genero"))
-    || normalizarGenero(buscarGeneroPorNombre(nombre))
-    || null;
-}
+/* Avatar: solo se pide la imagen de este niño; si falta o falla, se oculta */
+document.querySelectorAll("[data-avatar]").forEach(caja => {
+  const img = caja.querySelector("img");
+  if (!avatar) return;
+  img.addEventListener("error", () => { caja.hidden = true; });
+  img.addEventListener("load", () => { caja.hidden = false; });
+  img.src = "avatares/" + encodeURIComponent(avatar);
+});
 
 document.querySelectorAll("[data-g]").forEach(elemento => {
   const [masculino,femenino] = elemento.dataset.g.split(",");
@@ -1097,7 +1145,6 @@ const marcadas = new Set();
 const elegidas = [];
 const sellos = new Set();
 let misionElegida = null;
-let usandoTextoLibre = false;
 let toastTimer = null;
 
 function irA(id) {
@@ -1250,9 +1297,9 @@ function actualizarCorazones() {
     $("heartLabel"+i).textContent = recortar(texto,32);
   }
 
-  $("choiceCount").textContent = usandoTextoLibre
-    ? ""
-    : `${elegidas.length} de 3 corazones`;
+  $("choiceCount").textContent = marcadas.size > 0
+    ? `${elegidas.length} de 3 tarjetas elegidas`
+    : "";
 }
 
 function actualizarEleccion() {
@@ -1267,11 +1314,9 @@ function actualizarEleccion() {
     ...elegidas.filter(id => marcadas.has(id))
   );
 
-  usandoTextoLibre = disponibles.length===0;
-  $("freeChoices").hidden = !usandoTextoLibre;
-  contenedor.hidden = usandoTextoLibre;
+  contenedor.hidden = disponibles.length===0;
 
-  if (usandoTextoLibre) {
+  if (disponibles.length===0) {
     actualizarCorazones();
     return;
   }
@@ -1314,19 +1359,24 @@ function actualizarEleccion() {
   actualizarCorazones();
 }
 
-function obtenerCosasElegidas() {
-  if (usandoTextoLibre) {
-    return [1,2,3]
-      .map(i => $("free"+i).value.trim())
-      .filter(Boolean);
-  }
-
+function obtenerTarjetasElegidas() {
   return elegidas
     .map(id => {
       const pregunta = obtenerPregunta(id);
       return pregunta ? pregunta[0] : "";
     })
     .filter(Boolean);
+}
+
+function obtenerTextosEscritos() {
+  return [1,2,3]
+    .map(i => $("free"+i).value.trim())
+    .filter(Boolean);
+}
+
+/* Tarjetas elegidas + lo que escribieron con sus palabras */
+function obtenerCosasElegidas() {
+  return [...obtenerTarjetasElegidas(),...obtenerTextosEscritos()];
 }
 
 function construirMisiones() {
@@ -1380,14 +1430,17 @@ function agregarRenglones(destino,cantidad) {
 
 function prepararImpresion() {
   $("printName").textContent = nombre;
-  $("printPhrase").textContent = fraseFinal;
 
   const destinoCosas = $("printChoices");
   destinoCosas.replaceChildren();
 
-  const cosas = obtenerCosasElegidas();
+  /* Lo que escribieron siempre se imprime; las tarjetas, según la configuración */
+  const cosas = [
+    ...(IMPRIMIR_COSAS_ELEGIDAS ? obtenerTarjetasElegidas() : []),
+    ...obtenerTextosEscritos()
+  ];
 
-  if (IMPRIMIR_COSAS_ELEGIDAS && cosas.length) {
+  if (cosas.length) {
     const lista = document.createElement("ol");
     cosas.forEach(cosa => {
       const item = document.createElement("li");
